@@ -71,7 +71,7 @@ function createSubControl() {
         wrapper.style.userSelect = 'none';
         wrapper.style.width = 'fit-content';
         wrapper.style.minWidth = '140px';
-        wrapper.style.height = '35px';
+        wrapper.style.height = '34px';
 
         const label = document.createElement('span');
         label.textContent = 'Auto Subtitles';
