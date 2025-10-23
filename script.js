@@ -108,7 +108,7 @@ function createSubControl() {
 
         checkbox.addEventListener('change', () => {
             if (checkbox.checked) {
-                checkbox.style.background = '#4caf50';
+                checkbox.style.background = '#0aaaf1';
                 console.log("Auto subtitles ON");
                 shouldEnableSubs = true;
             } else {
@@ -120,7 +120,7 @@ function createSubControl() {
 
         checkbox2.addEventListener('change', () => {
             if (checkbox2.checked) {
-                checkbox2.style.background = '#4caf50';
+                checkbox2.style.background = '#0aaaf1';
                 console.log("Auto skip ON");
                 shouldSkipStart = true;
             } else {
@@ -136,10 +136,10 @@ function createSubControl() {
         wrapper.appendChild(label2);
         wrapper.appendChild(checkbox2);
         container.appendChild(wrapper);
-        checkbox.style.background = '#4caf50';
+        checkbox.style.background = '#0aaaf1';
         checkbox.checked = true;
 
-        checkbox2.style.background = '#4caf50';
+        checkbox2.style.background = '#0aaaf1';
         checkbox2.checked = true;
     }
     isSubsElemAdded = true;
