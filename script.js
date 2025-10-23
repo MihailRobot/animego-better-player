@@ -78,7 +78,7 @@ function createSubControl() {
 
         const label2 = document.createElement('span');
         label2.textContent = 'Auto Skip';
-        label2.marginLeft = "10px";
+        label2.style.marginLeft = "10px";
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
