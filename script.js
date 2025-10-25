@@ -53,6 +53,29 @@ function setColorInIframe() {
 }
 
 
+function createCheckbox(onByDefault = false) {
+
+    const newCheckbox = document.createElement('input');
+    newCheckbox.type = 'checkbox';
+    newCheckbox.style.appearance = 'none';
+    newCheckbox.style.width = '20px';
+    newCheckbox.style.height = '20px';
+    newCheckbox.style.borderRadius = '10px';
+    newCheckbox.style.background = '#555';
+    newCheckbox.style.position = 'relative';
+    newCheckbox.style.cursor = 'pointer';
+    newCheckbox.style.marginLeft = '5px';
+    newCheckbox.style.transition = 'background 0.3s';
+
+    if (onByDefault) {
+        newCheckbox.style.background = '#0aaaf1';
+        newCheckbox.checked = true;
+    }
+
+
+    return newCheckbox;
+}
+
 function createSubControl() {
     const container = document.querySelector('.selects.ui');
     if (container) {
@@ -80,72 +103,71 @@ function createSubControl() {
         label2.textContent = 'Auto Skip';
         label2.style.marginLeft = "10px";
 
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = 'autoSubsToggle';
-        checkbox.style.appearance = 'none';
-        checkbox.style.width = '20px';
-        checkbox.style.height = '20px';
-        checkbox.style.borderRadius = '10px';
-        checkbox.style.background = '#555';
-        checkbox.style.position = 'relative';
-        checkbox.style.cursor = 'pointer';
-        checkbox.style.marginLeft = '5px';
-        checkbox.style.transition = 'background 0.3s';
+        const label3 = document.createElement('span');
+        label3.textContent = 'Auto Next';
+        label3.style.marginLeft = "10px";
 
-        const checkbox2 = document.createElement('input');
-        checkbox2.type = 'checkbox';
-        checkbox2.id = 'autoSkipToggle';
-        checkbox2.style.appearance = 'none';
-        checkbox2.style.width = '20px';
-        checkbox2.style.height = '20px';
-        checkbox2.style.borderRadius = '10px';
-        checkbox2.style.background = '#555';
-        checkbox2.style.position = 'relative';
-        checkbox2.style.cursor = 'pointer';
-        checkbox2.style.marginLeft = '5px';
-        checkbox2.style.transition = 'background 0.3s';
+        const autoSubsCheckbox = createCheckbox(false);
+        const skipIntroCheckbox = createCheckbox(true);
+        const skipEndCheckbox = createCheckbox(false);
 
-        checkbox.addEventListener('change', () => {
-            if (checkbox.checked) {
-                checkbox.style.background = '#0aaaf1';
+        autoSubsCheckbox.addEventListener('change', () => {
+            if (autoSubsCheckbox.checked) {
+                autoSubsCheckbox.style.background = '#0aaaf1';
                 console.log("Auto subtitles ON");
                 shouldEnableSubs = true;
             } else {
-                checkbox.style.background = '#555';
+                autoSubsCheckbox.style.background = '#555';
                 console.log("Auto subtitles OFF");
                 shouldEnableSubs = false;
             }
         });
 
-        checkbox2.addEventListener('change', () => {
-            if (checkbox2.checked) {
-                checkbox2.style.background = '#0aaaf1';
+        skipIntroCheckbox.addEventListener('change', () => {
+            if (skipIntroCheckbox.checked) {
+                skipIntroCheckbox.style.background = '#0aaaf1';
                 console.log("Auto skip ON");
                 shouldSkipStart = true;
             } else {
-                checkbox2.style.background = '#555';
+                skipIntroCheckbox.style.background = '#555';
                 console.log("Auto skip OFF");
                 shouldSkipStart = false;
             }
         });
 
+        skipEndCheckbox.addEventListener('change', () => {
+            if (skipEndCheckbox.checked) {
+                skipEndCheckbox.style.background = '#0aaaf1';
+                console.log("Auto skip end ON");
+                shouldSkipEnd = true;
+            } else {
+                skipEndCheckbox.style.background = '#555';
+                console.log("Auto skip end OFF");
+                shouldSkipEnd = false;
+            }
+        });
+
 
         wrapper.appendChild(label);
-        wrapper.appendChild(checkbox);
+        wrapper.appendChild(autoSubsCheckbox);
         wrapper.appendChild(label2);
-        wrapper.appendChild(checkbox2);
-        container.appendChild(wrapper);
-        checkbox.style.background = '#0aaaf1';
-        checkbox.checked = true;
+        wrapper.appendChild(skipIntroCheckbox);
+        wrapper.appendChild(label3);
+        wrapper.appendChild(skipEndCheckbox);
 
-        checkbox2.style.background = '#0aaaf1';
-        checkbox2.checked = true;
+        container.appendChild(wrapper);
     }
     isSubsElemAdded = true;
 }
 
+
+
+
 function enableSubs() {
+
+    if (!isSubsElemAdded) {
+        createSubControl();
+    }
 
     if (shouldEnableSubs) {
         const captionsButton = document.querySelector('button[type="button"][data-allplay="captions"]');
@@ -153,12 +175,9 @@ function enableSubs() {
 
         if (captionsButton && captionsButton.getAttribute("aria-pressed") !== "true") {
 
-            if (!isSubsElemAdded) {
-                createSubControl();
-            }
 
-            var text = document.
-                querySelector("div.allplay__controls__item.allplay__time--current.allplay__time").innerText;
+
+            var text = document.querySelector("div.allplay__controls__item.allplay__time--current.allplay__time").innerText;
 
             if (text != "00:00" && !captionsButton.hasAttribute('hidden') && getComputedStyle(captionsButton).display !== 'none') {
                 captionsButton.click();
@@ -168,10 +187,18 @@ function enableSubs() {
     }
 
     if (shouldSkipStart) {
-        var skipBtn = document.querySelector('.allplay__skip.allplay__skip--intro');
+        var skiptIntroBtn = document.querySelector('.allplay__skip.allplay__skip--intro');
 
-        if (skipBtn && !skipBtn.hasAttribute('hidden')) {
-            skipBtn.click();
+        if (skiptIntroBtn && !skiptIntroBtn.hasAttribute('hidden')) {
+            skiptIntroBtn.click();
+        }
+    }
+
+    if (shouldSkipEnd) {
+        var skipEndBtn = document.querySelector('.allplay__skip.allplay__skip--credits');
+
+        if (skipEndBtn && !skipEndBtn.hasAttribute('hidden')) {
+            skipEndBtn.click();
         }
     }
 
@@ -180,8 +207,9 @@ function enableSubs() {
 
 
 var isSubsElemAdded = false;
-var shouldEnableSubs = true;
+var shouldEnableSubs = false;
 var shouldSkipStart = true;
+var shouldSkipEnd = false;
 
 console.log('Started script');
 setColorInIframe();
