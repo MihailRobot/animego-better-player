@@ -23,12 +23,18 @@ function cleanSubtitles(input) {
         .split('\n')
         .map(line =>
             line
-                .replace(/<(?!\/?b\b)[^>]*>/g, '')       // remove tags except <b>
-                .replace(/&#x[0-9A-Fa-f]+;/g, '')        // remove hex entities
-                .replace(/\\{1,2}h/g, '')                // remove \h or \\h
-                .replace(/\{=.+\}/g, '')                 // remove {=...}
+                // remove all tags except <b> and </b>
+                .replace(/<(?!\/?b\b)[^>]*>/g, '')
+                // remove hex entities like &#x1234;
+                .replace(/&#x[0-9A-Fa-f]+;/g, '')
+                // remove \h or \\h
+                .replace(/\\{1,2}h/g, '')
+                // remove {=...}
+                .replace(/\{=.+\}/g, '')
+                // remove <b>...</b> blocks that contain only path-like commands
+                .replace(/<b>\s*m\s*\d+(?:\s+\d+)*(?:\s+[a-z]\s*\d+(?:\s+\d+)*)*\s*<\/b>/gi, '')
         )
-        // remove lines starting with "m" followed by numbers (like "m 0 0 l 100 0 100 100 0 100")
+        // also remove lines that are only path commands (in case no <b> tags left)
         .filter(line => !/^\s*m\s*\d+(?:\s+\d+)*(?:\s+[a-z]\s*\d+(?:\s+\d+)*)*\s*$/i.test(line))
         .join('\n')
         .trim();
