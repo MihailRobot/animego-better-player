@@ -23,15 +23,17 @@ function cleanSubtitles(input) {
         .split('\n')
         .map(line =>
             line
-                .replace(/<(?!\/?b\b)[^>]*>/g, '')
-                .replace(/&#x[0-9A-Fa-f]+;/g, '')
-                .replace(/\\{1,2}h/g, '')
-                .replace(/\{=.+\}/g, '')
+                .replace(/<(?!\/?b\b)[^>]*>/g, '')       // remove tags except <b>
+                .replace(/&#x[0-9A-Fa-f]+;/g, '')        // remove hex entities
+                .replace(/\\{1,2}h/g, '')                // remove \h or \\h
+                .replace(/\{=.+\}/g, '')                 // remove {=...}
         )
-        .filter(line => !/^\s*m\b/i.test(line))
+        // remove lines starting with "m" followed by numbers (like "m 0 0 l 100 0 100 100 0 100")
+        .filter(line => !/^\s*m\s*\d+(?:\s+\d+)*(?:\s+[a-z]\s*\d+(?:\s+\d+)*)*\s*$/i.test(line))
         .join('\n')
         .trim();
 }
+
 
 function setColorInIframe() {
     const element = document.querySelector('.allplay--video .allplay__progress__buffer');
