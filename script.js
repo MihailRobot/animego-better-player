@@ -4,7 +4,12 @@ const observer = new MutationObserver(mutationsList => {
             mutation.addedNodes.forEach(node => {
                 if (node.classList?.contains('allplay__caption')) {
                     const captionEl = document.querySelector('.allplay__caption');
-                    captionEl.innerHTML = cleanSubtitles(captionEl.innerHTML);
+                    var cleaned = cleanSubtitles(captionEl.innerHTML);
+                    captionEl.innerHTML = cleaned;
+
+                    var timeout = cleaned.length * 50;
+
+                    setTimeout(() => removeStuckSubtitles(cleaned), timeout);
                 }
             });
         }
@@ -17,6 +22,21 @@ observer.observe(document.documentElement, {
     attributes: true,
     characterData: true
 });
+
+function removeStuckSubtitles(previous) {
+
+    const captionEl = document.querySelector('.allplay__caption');
+
+    const newCaption = cleanSubtitles(captionEl.innerHTML);
+
+    if (!newCaption) return;
+
+    if (newCaption == previous) {
+        captionEl.style.display = "none";
+        console.log("hid stuck subs");
+    }
+
+}
 
 function cleanSubtitles(input) {
     return input
