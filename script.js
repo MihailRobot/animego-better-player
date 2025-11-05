@@ -38,7 +38,7 @@ function removeStuckSubtitles(previous) {
 
 }
 
-function cleanSubtitles(input) { 
+function cleanSubtitles(input) {
     let lines = input
         .split('\n')
         .map(line =>
@@ -57,17 +57,22 @@ function cleanSubtitles(input) {
         )
         .filter(line => line && !/^\s*m\s*\d+(?:\s+\d+)*(?:\s+[a-z]\s*\d+(?:\s+\d+)*)*\s*$/i.test(line));
 
-    // Deduplicate consecutive repeating patterns of any size
+    // Deduplicate consecutive repeating patterns of any size (3+ repeats only)
     let changed = true;
     while (changed) {
         changed = false;
-        for (let size = Math.floor(lines.length / 2); size >= 1; size--) {
-            for (let i = 0; i + size * 2 <= lines.length; ) {
+        for (let size = Math.floor(lines.length / 3); size >= 1; size--) { // only check sizes that can repeat 3+ times
+            for (let i = 0; i + size * 3 <= lines.length;) {
                 const block1 = lines.slice(i, i + size);
                 const block2 = lines.slice(i + size, i + size * 2);
-                if (block1.join('\n') === block2.join('\n')) {
-                    // Skip all consecutive repeats of this block
-                    let j = i + size * 2;
+                const block3 = lines.slice(i + size * 2, i + size * 3);
+
+                if (
+                    block1.join('\n') === block2.join('\n') &&
+                    block1.join('\n') === block3.join('\n')
+                ) {
+                    // Found 3+ identical consecutive blocks
+                    let j = i + size * 3;
                     while (
                         j + size <= lines.length &&
                         lines.slice(j, j + size).join('\n') === block1.join('\n')
@@ -83,6 +88,7 @@ function cleanSubtitles(input) {
             }
         }
     }
+
 
     // Also remove 3+ identical lines in a row (just in case)
     const final = [];
