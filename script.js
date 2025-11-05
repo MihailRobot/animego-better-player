@@ -39,7 +39,7 @@ function removeStuckSubtitles(previous) {
 }
 
 function cleanSubtitles(input) { 
-    const cleaned = input
+    let lines = input
         .split('\n')
         .map(line =>
             line
@@ -53,24 +53,48 @@ function cleanSubtitles(input) {
                 .replace(/\{=.+\}/g, '')
                 // remove <b>...</b> blocks that contain only path-like commands
                 .replace(/<b>\s*m\s*\d+(?:\s+\d+)*(?:\s+[a-z]\s*\d+(?:\s+\d+)*)*\s*<\/b>/gi, '')
+                .trim()
         )
-        // remove lines that are only path commands (in case no <b> tags left)
-        .filter(line => !/^\s*m\s*\d+(?:\s+\d+)*(?:\s+[a-z]\s*\d+(?:\s+\d+)*)*\s*$/i.test(line));
+        .filter(line => line && !/^\s*m\s*\d+(?:\s+\d+)*(?:\s+[a-z]\s*\d+(?:\s+\d+)*)*\s*$/i.test(line));
 
-    // remove lines that repeat 3 or more times consecutively
-    const result = [];
-    for (let i = 0; i < cleaned.length; i++) {
-        const current = cleaned[i].trim();
-        const prev1 = cleaned[i - 1]?.trim();
-        const prev2 = cleaned[i - 2]?.trim();
-        // only push if not the same as previous 2 lines
+    // Remove repeating patterns like a,b,a,b,a,b or a,b,c,a,b,c
+    for (let size = Math.floor(lines.length / 2); size >= 1; size--) {
+        let changed = false;
+        const result = [];
+        for (let i = 0; i < lines.length;) {
+            // Check if next block repeats immediately
+            const block1 = lines.slice(i, i + size).join('\n');
+            const block2 = lines.slice(i + size, i + size * 2).join('\n');
+            if (block1 && block1 === block2) {
+                // Skip repeated blocks
+                while (lines.slice(i, i + size).join('\n') === block1) {
+                    i += size;
+                }
+                result.push(...block1.split('\n'));
+                changed = true;
+            } else {
+                result.push(lines[i]);
+                i++;
+            }
+        }
+        lines = result;
+        if (changed) break; // restart from largest pattern found
+    }
+
+    // Also remove 3+ identical lines in a row (just to be safe)
+    const final = [];
+    for (let i = 0; i < lines.length; i++) {
+        const current = lines[i];
+        const prev1 = lines[i - 1];
+        const prev2 = lines[i - 2];
         if (!(current === prev1 && current === prev2)) {
-            result.push(cleaned[i]);
+            final.push(current);
         }
     }
 
-    return result.join('\n').trim();
+    return final.join('\n').trim();
 }
+
 
 
 
