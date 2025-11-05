@@ -38,8 +38,8 @@ function removeStuckSubtitles(previous) {
 
 }
 
-function cleanSubtitles(input) {
-    return input
+function cleanSubtitles(input) { 
+    const cleaned = input
         .split('\n')
         .map(line =>
             line
@@ -54,11 +54,24 @@ function cleanSubtitles(input) {
                 // remove <b>...</b> blocks that contain only path-like commands
                 .replace(/<b>\s*m\s*\d+(?:\s+\d+)*(?:\s+[a-z]\s*\d+(?:\s+\d+)*)*\s*<\/b>/gi, '')
         )
-        // also remove lines that are only path commands (in case no <b> tags left)
-        .filter(line => !/^\s*m\s*\d+(?:\s+\d+)*(?:\s+[a-z]\s*\d+(?:\s+\d+)*)*\s*$/i.test(line))
-        .join('\n')
-        .trim();
+        // remove lines that are only path commands (in case no <b> tags left)
+        .filter(line => !/^\s*m\s*\d+(?:\s+\d+)*(?:\s+[a-z]\s*\d+(?:\s+\d+)*)*\s*$/i.test(line));
+
+    // remove lines that repeat 3 or more times consecutively
+    const result = [];
+    for (let i = 0; i < cleaned.length; i++) {
+        const current = cleaned[i].trim();
+        const prev1 = cleaned[i - 1]?.trim();
+        const prev2 = cleaned[i - 2]?.trim();
+        // only push if not the same as previous 2 lines
+        if (!(current === prev1 && current === prev2)) {
+            result.push(cleaned[i]);
+        }
+    }
+
+    return result.join('\n').trim();
 }
+
 
 
 function setColorInIframe() {
