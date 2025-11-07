@@ -8,7 +8,7 @@ const observer = new MutationObserver(mutationsList => {
                     captionEl.innerHTML = cleaned;
 
                     var timeout = cleaned.length * 80;
-
+                    if(timeout < 3000) timeout = 3000;
                     setTimeout(() => removeStuckSubtitles(cleaned), timeout);
                 }
             });
