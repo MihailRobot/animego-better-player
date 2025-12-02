@@ -40,22 +40,18 @@ function removeStuckSubtitles(previous) {
 
 function cleanSubtitles(input) {
     let lines = input
-        .split('\n')
-        .map(line =>
-            line
-                // remove all tags except <b> and </b>
-                .replace(/<(?!\/?b\b)[^>]*>/g, '')
-                // remove hex entities like &#x1234;
-                .replace(/&#x[0-9A-Fa-f]+;/g, '')
-                // remove \h or \\h
-                .replace(/\\{1,2}h/g, '')
-                // remove {=...}
-                .replace(/\{=.+\}/g, '')
-                // remove <b>...</b> blocks that contain only path-like commands
-                .replace(/<b>\s*m\s*\d+(?:\s+\d+)*(?:\s+[a-z]\s*\d+(?:\s+\d+)*)*\s*<\/b>/gi, '')
-                .trim()
-        )
-        .filter(line => line && !/^\s*m\s*\d+(?:\s+\d+)*(?:\s+[a-z]\s*\d+(?:\s+\d+)*)*\s*$/i.test(line));
+    .split('\n')
+    .map(line =>
+        line
+            .replace(/<(?!\/?b\b)[^>]*>/g, '')
+            .replace(/&#x[0-9A-Fa-f]+;/g, '')
+            .replace(/\\{1,2}h/g, '')
+            .replace(/\{=.+\}/g, '')
+            .replace(/<b>\s*m\s*-?\d+(?:\s+-?\d+)*(?:\s+[a-z]\s*-?\d+(?:\s+-?\d+)*)*\s*<\/b>/gi, '')
+            .trim()
+    )
+    .filter(line => line && !/^\s*m\s*-?\d+(?:\s+-?\d+)*(?:\s+[a-z]\s*-?\d+(?:\s+-?\d+)*)*\s*$/i.test(line));
+
 
     // Deduplicate consecutive repeating patterns of any size (3+ repeats only)
     let changed = true;
