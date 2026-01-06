@@ -307,8 +307,7 @@ enableSubs();
         xhr.open = function (method, url, ...rest) {
             if (
                 typeof url === 'string' &&
-                url.includes('.m3u8') &&
-                !agoData.m3u8
+                url.includes('.m3u8')
             ) {
                 agoData.m3u8 = url;
                 console.log('[XHR m3u8]', url);
@@ -330,7 +329,7 @@ enableSubs();
             for (const node of mutation.addedNodes) {
                 if (node.tagName === 'TRACK') {
                     const src = node.src;
-                    if (src && !data.token) {
+                    if (src) {
                         try {
                             const t = new URL(src).searchParams.get('t');
                             if (t) {
@@ -353,7 +352,7 @@ enableSubs();
             const url = e.name;
             if (!url || typeof url !== 'string') continue;
 
-            if (url.includes('.vtt') && !agoData.token) {
+            if (url.includes('.vtt')) {
                 try {
                     const u = new URL(url);
                     const t = u.searchParams.get('t');
@@ -441,4 +440,5 @@ enableSubs();
         clearInterval(interval);
     }, 500);
 })();
+
 
