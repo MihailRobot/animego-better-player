@@ -353,12 +353,12 @@ enableSubs();
             const url = e.name;
             if (!url || typeof url !== 'string') continue;
 
-            if (url.includes('.vtt') && !data.token) {
+            if (url.includes('.vtt') && !agoData.token) {
                 try {
                     const u = new URL(url);
                     const t = u.searchParams.get('t');
                     if (t) {
-                        data.token = t;
+                        agoData.token = t;
                         console.log('[VTT token]', t);
                         updateUI();
                     }
@@ -441,6 +441,4 @@ enableSubs();
         clearInterval(interval);
     }, 500);
 })();
-
-
 
