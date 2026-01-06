@@ -284,3 +284,138 @@ var shouldSkipEnd = false;
 console.log('Started script');
 setColorInIframe();
 enableSubs();
+
+
+
+
+(() => {
+    const agoData = {
+        m3u8: null,
+        token: null,
+        origin: location.origin,
+        referer: location.href
+    };
+
+    /* ===============================
+       XHR HOOK → m3u8
+    =============================== */
+    const OriginalXHR = window.XMLHttpRequest;
+
+    window.XMLHttpRequest = function () {
+        const xhr = new OriginalXHR();
+        const originalOpen = xhr.open;
+
+        xhr.open = function (method, url, ...rest) {
+            if (
+                typeof url === 'string' &&
+                url.includes('.m3u8') &&
+                !agoData.m3u8
+            ) {
+                agoData.m3u8 = url;
+                console.log('[XHR m3u8]', url);
+                updateUI();
+            }
+
+            return originalOpen.call(this, method, url, ...rest);
+        };
+
+        return xhr;
+    };
+
+    /* ===============================
+       PERFORMANCE observerToken → vtt token
+    =============================== */
+    const observerToken = new PerformanceobserverToken(list => {
+        for (const e of list.getEntries()) {
+            const url = e.name;
+            if (!url || typeof url !== 'string') continue;
+
+            if (url.includes('.vtt') && !agoData.token) {
+                try {
+                    const u = new URL(url);
+                    const t = u.searchParams.get('t');
+                    if (t) {
+                        agoData.token = t;
+                        console.log('[VTT token]', t);
+                        updateUI();
+                    }
+                } catch {}
+            }
+        }
+    });
+
+    observerToken.observe({ entryTypes: ['resource'] });
+
+    /* ===============================
+       BUILD MPV COMMAND
+    =============================== */
+    function buildMPV() {
+        if (!agoData.m3u8 || !agoData.token) return '';
+
+        return `mpvnet.exe --http-header-fields="Origin: ${agoData.origin},Authorizations: Bearer ${agoData.token},Referrer: ${agoData.referer}" ${agoData.m3u8}`;
+    }
+
+    /* ===============================
+       UI
+    =============================== */
+    function updateUI() {
+        const input = document.getElementById('direct-input');
+        if (!input) return;
+
+        const out = [
+            agoData.m3u8 ? `M3U8: ${agoData.m3u8}` : 'M3U8: waiting…',
+            agoData.token ? `Token: ${agoData.token}` : 'Token: waiting…',
+            '',
+            buildMPV()
+        ].join('\n');
+
+        input.value = out;
+    }
+
+    const interval = setInterval(() => {
+        const target = document.querySelector('.serial-panel.hidden-seasons');
+        if (!target || target.querySelector('.link-btn')) return;
+
+        const btn = document.createElement('button');
+        btn.className = 'link-btn';
+        btn.textContent = 'MPV';
+
+        Object.assign(btn.style, {
+            marginLeft: '8px',
+            marginTop: '14px',
+            padding: '4px 8px',
+            fontSize: '12px',
+            background: '#111',
+            color: '#fff',
+            border: '1px solid #333',
+            cursor: 'pointer'
+        });
+
+        const input = document.createElement('textarea');
+        input.id = 'direct-input';
+        input.readOnly = true;
+
+        Object.assign(input.style, {
+            marginLeft: '6px',
+            marginTop: '6px',
+            width: '520px',
+            height: '150px',
+            background: '#0d0d0d',
+            color: '#fff',
+            border: '1px solid #333',
+            fontSize: '12px',
+            display: 'none'
+        });
+
+        btn.onclick = () => {
+            input.style.display =
+                input.style.display === 'none' ? 'block' : 'none';
+            updateUI();
+        };
+
+        target.appendChild(btn);
+        target.appendChild(input);
+        clearInterval(interval);
+    }, 500);
+})();
+
