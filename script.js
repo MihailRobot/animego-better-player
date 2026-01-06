@@ -322,29 +322,30 @@ enableSubs();
         return xhr;
     };
 
-    /* ===============================
-       PERFORMANCE observerToken → vtt token
-    =============================== */
-    const observerToken = new PerformanceobserverToken(list => {
-        for (const e of list.getEntries()) {
-            const url = e.name;
-            if (!url || typeof url !== 'string') continue;
 
-            if (url.includes('.vtt') && !agoData.token) {
-                try {
-                    const u = new URL(url);
-                    const t = u.searchParams.get('t');
-                    if (t) {
-                        agoData.token = t;
-                        console.log('[VTT token]', t);
-                        updateUI();
+    /* --------------------
+       Track element observer
+    -------------------- */
+    const trackObserver = new MutationObserver(mutations => {
+        for (const mutation of mutations) {
+            for (const node of mutation.addedNodes) {
+                if (node.tagName === 'TRACK') {
+                    const src = node.src;
+                    if (src && !data.token) {
+                        try {
+                            const t = new URL(src).searchParams.get('t');
+                            if (t) {
+                                data.token = t;
+                                console.log('[track token]', t);
+                            }
+                        } catch {}
                     }
-                } catch {}
+                }
             }
         }
     });
 
-    observerToken.observe({ entryTypes: ['resource'] });
+    trackObserver.observe(document.body, { childList: true, subtree: true });
 
     /* ===============================
        BUILD MPV COMMAND
@@ -373,7 +374,7 @@ enableSubs();
     }
 
     const interval = setInterval(() => {
-        const target = document.querySelector('.serial-panel.hidden-seasons');
+        const target = document.querySelector('.selects.ui');
         if (!target || target.querySelector('.link-btn')) return;
 
         const btn = document.createElement('button');
@@ -418,4 +419,6 @@ enableSubs();
         clearInterval(interval);
     }, 500);
 })();
+
+
 
