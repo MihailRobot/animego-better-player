@@ -306,9 +306,7 @@ enableSubs();
 
         xhr.open = function (method, url, ...rest) {
             if (
-                typeof url === 'string' &&
-                url.includes('.m3u8')
-            ) {
+                typeof url === 'string' && url.includes('.m3u8') && url.includes('master')) {
                 agoData.m3u8 = url;
                 console.log('[XHR m3u8]', url);
                 updateUI();
@@ -384,12 +382,11 @@ enableSubs();
         const input = document.getElementById('direct-input');
         if (!input) return;
 
-        const out = [
-            agoData.m3u8 ? `M3U8: ${agoData.m3u8}` : 'M3U8: waiting…',
-            agoData.token ? `Token: ${agoData.token}` : 'Token: waiting…',
-            '',
+var out = 
+            agoData.m3u8 ? `` : 'M3U8: waiting…\n' +
+            agoData.token ? `` : 'Token: waiting…\n' +
             buildMPV()
-        ].join('\n');
+ 
 
         input.value = out;
     }
@@ -440,5 +437,4 @@ enableSubs();
         clearInterval(interval);
     }, 500);
 })();
-
 
