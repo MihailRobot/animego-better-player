@@ -287,7 +287,6 @@ enableSubs();
 
 
 
-
 (() => {
     const agoData = {
         m3u8: null,
@@ -346,6 +345,29 @@ enableSubs();
     });
 
     trackObserver.observe(document.body, { childList: true, subtree: true });
+	
+	
+	
+	    const perfObserver = new PerformanceObserver(list => {
+        for (const e of list.getEntries()) {
+            const url = e.name;
+            if (!url || typeof url !== 'string') continue;
+
+            if (url.includes('.vtt') && !data.token) {
+                try {
+                    const u = new URL(url);
+                    const t = u.searchParams.get('t');
+                    if (t) {
+                        data.token = t;
+                        console.log('[VTT token]', t);
+                        updateUI();
+                    }
+                } catch {}
+            }
+        }
+    });
+
+    perfObserver.observe({ entryTypes: ['resource'] });
 
     /* ===============================
        BUILD MPV COMMAND
