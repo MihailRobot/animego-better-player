@@ -286,7 +286,6 @@ setColorInIframe();
 enableSubs();
 
 
-
 (() => {
     const agoData = {
         m3u8: null,
@@ -382,11 +381,12 @@ enableSubs();
         const input = document.getElementById('direct-input');
         if (!input) return;
 
-var out = 
-            agoData.m3u8 ? `` : 'M3U8: waiting…\n' +
-            agoData.token ? `` : 'Token: waiting…\n' +
-            buildMPV()
- 
+
+			var m3 = agoData.m3u8 ? '' : 'M3U8: waiting…\n';
+            var tok = agoData.token ? '' : 'Token: waiting…\n';
+            var mpv = buildMPV();
+			
+			var out = m3 + tok + mpv;
 
         input.value = out;
     }
@@ -437,4 +437,5 @@ var out =
         clearInterval(interval);
     }, 500);
 })();
+
 
