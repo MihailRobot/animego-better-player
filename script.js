@@ -5,10 +5,16 @@ const observer = new MutationObserver(mutationsList => {
                 if (node.classList?.contains('allplay__caption')) {
                     const captionEl = document.querySelector('.allplay__caption');
                     var cleaned = cleanSubtitles(captionEl.innerHTML);
+
+
+                    if (captionEl.innerHTML != cleaned) {
+                        console.log("Cleaned subs");
+                    }
+
                     captionEl.innerHTML = cleaned;
 
                     var timeout = cleaned.length * 80;
-                    if(timeout < 3000) timeout = 3000;
+                    if (timeout < 3000) timeout = 3000;
                     setTimeout(() => removeStuckSubtitles(cleaned), timeout);
                 }
             });
@@ -40,17 +46,20 @@ function removeStuckSubtitles(previous) {
 
 function cleanSubtitles(input) {
     let lines = input
-    .split('\n')
-    .map(line =>
-        line
-            .replace(/<(?!\/?b\b)[^>]*>/g, '')
-            .replace(/&#x[0-9A-Fa-f]+;/g, '')
-            .replace(/\\{1,2}h/g, '')
-            .replace(/\{=.+\}/g, '')
-            .replace(/<b>\s*m\s*-?\d+(?:\s+-?\d+)*(?:\s+[a-z]\s*-?\d+(?:\s+-?\d+)*)*\s*<\/b>/gi, '')
-            .trim()
-    )
-    .filter(line => line && !/^\s*m\s*-?\d+(?:\s+-?\d+)*(?:\s+[a-z]\s*-?\d+(?:\s+-?\d+)*)*\s*$/i.test(line));
+        .split('\n')
+        .map(line =>
+            line
+                .replace(/<(?!\/?b\b)[^>]*>/g, '')
+                .replace(/&#x[0-9A-Fa-f]+;/g, '')
+                .replace(/\\{1,2}h/g, '')
+                .replace(/\{=.+\}/g, '')
+                .replace(/<b>\s*m\s*-?\d+(?:\s+-?\d+)*(?:\s+[a-z]\s*-?\d+(?:\s+-?\d+)*)*\s*<\/b>/gi, '')
+                .trim()
+        )
+        .filter(line =>
+            line &&
+            !/^\s*m\s*-?\d+(?:\.\d+)?[a-z]*/i.test(line)
+        );
 
 
     // Deduplicate consecutive repeating patterns of any size (3+ repeats only)
@@ -333,7 +342,7 @@ enableSubs();
                                 data.token = t;
                                 console.log('[track token]', t);
                             }
-                        } catch {}
+                        } catch { }
                     }
                 }
             }
@@ -341,10 +350,10 @@ enableSubs();
     });
 
     trackObserver.observe(document.body, { childList: true, subtree: true });
-	
-	
-	
-	    const perfObserver = new PerformanceObserver(list => {
+
+
+
+    const perfObserver = new PerformanceObserver(list => {
         for (const e of list.getEntries()) {
             const url = e.name;
             if (!url || typeof url !== 'string') continue;
@@ -358,7 +367,7 @@ enableSubs();
                         console.log('[VTT token]', t);
                         updateUI();
                     }
-                } catch {}
+                } catch { }
             }
         }
     });
@@ -382,11 +391,11 @@ enableSubs();
         if (!input) return;
 
 
-			var m3 = agoData.m3u8 ? '' : 'M3U8: waiting…\n';
-            var tok = agoData.token ? '' : 'Token: waiting…\n';
-            var mpv = buildMPV();
-			
-			var out = m3 + tok + mpv;
+        var m3 = agoData.m3u8 ? '' : 'M3U8: waiting…\n';
+        var tok = agoData.token ? '' : 'Token: waiting…\n';
+        var mpv = buildMPV();
+
+        var out = m3 + tok + mpv;
 
         input.value = out;
     }
