@@ -1,4 +1,4 @@
-const observer = new MutationObserver(mutationsList => {
+const captionObserver = new MutationObserver(mutationsList => {
     for (const mutation of mutationsList) {
         if (mutation.type === 'childList') {
             mutation.addedNodes.forEach(node => {
@@ -22,7 +22,7 @@ const observer = new MutationObserver(mutationsList => {
     }
 });
 
-observer.observe(document.documentElement, {
+captionObserver.observe(document.documentElement, {
     childList: true,
     subtree: true,
     attributes: true,
@@ -244,6 +244,8 @@ function createSubControl() {
 
 function enableSubs() {
 
+    console.log("enabled subs");
+    
     if (!isSubsElemAdded) {
         createSubControl();
     }
