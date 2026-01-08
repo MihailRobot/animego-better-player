@@ -244,7 +244,6 @@ function createSubControl() {
 
 function enableSubs() {
 
-    console.log("enabled subs");
     
     if (!isSubsElemAdded) {
         createSubControl();
