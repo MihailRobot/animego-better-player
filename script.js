@@ -422,6 +422,7 @@ enableSubs();
             fontSize: '12px',
             userSelect: 'none',
             width: 'fit-content',
+            marginLeft: '10px'
         });
 
         /* Header row */
