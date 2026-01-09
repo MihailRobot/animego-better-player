@@ -244,7 +244,6 @@ function createSubControl() {
 
 function enableSubs() {
 
-    
     if (!isSubsElemAdded) {
         createSubControl();
     }
@@ -401,49 +400,95 @@ enableSubs();
         input.value = out;
     }
 
+
     const interval = setInterval(() => {
-        const target = document.querySelector('.selects.ui');
-        if (!target || target.querySelector('.link-btn')) return;
+        const container = document.querySelector('.selects.ui');
+        if (!container || container.querySelector('.mpv-wrapper')) return;
 
-        const btn = document.createElement('button');
-        btn.className = 'link-btn';
-        btn.textContent = 'MPV';
-
-        Object.assign(btn.style, {
-            marginLeft: '8px',
-            marginTop: '14px',
-            padding: '4px 8px',
-            fontSize: '12px',
-            background: '#111',
+        /* Wrapper – same style as your other sub controls */
+        const wrapper = document.createElement('div');
+        wrapper.className = 'mpv-wrapper';
+        Object.assign(wrapper.style, {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
+            background: '#23282f',
+            borderRadius: '5px',
+            padding: '0px 8px',
             color: '#fff',
-            border: '1px solid #333',
+            maxHeight: "34px",
+            fontFamily: 'Verdana',
+            fontWeight: '700',
+            fontSize: '12px',
+            userSelect: 'none',
+            width: 'fit-content',
+        });
+
+        /* Header row */
+        const header = document.createElement('div');
+        Object.assign(header.style, {
+            display: 'flex',
+            alignItems: 'center',
+            height: '34px'
+        });
+
+        const title = document.createElement('span');
+        title.textContent = 'MPV';
+
+        /* Button */
+        const btn = document.createElement('button');
+        btn.textContent = '↓';
+        Object.assign(btn.style, {
+            height: '25px',
+            padding: '0 10px',
+            marginLeft: "5px",
+            fontSize: '12px',
+            fontFamily: 'Verdana',
+            fontWeight: '700',
+            background: '#0aaaf1',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '4px',
             cursor: 'pointer'
         });
 
+        /* Textarea */
         const input = document.createElement('textarea');
         input.id = 'direct-input';
         input.readOnly = true;
 
         Object.assign(input.style, {
-            marginLeft: '6px',
-            marginTop: '6px',
-            width: '520px',
+            width: '100%',
             height: '150px',
-            background: '#0d0d0d',
+            resize: 'none',
+            background: '#0d1117',
             color: '#fff',
             border: '1px solid #333',
+            borderRadius: '4px',
+            padding: '6px',
+            fontFamily: 'Consolas, monospace',
             fontSize: '12px',
-            display: 'none'
+            display: 'none',
+            marginBottom: '10px'
         });
 
         btn.onclick = () => {
-            input.style.display =
-                input.style.display === 'none' ? 'block' : 'none';
+            const visible = input.style.display !== 'none';
+            input.style.display = visible ? 'none' : 'block';
+            input.style.height = "100px";
+            wrapper.style.width = visible ? "auto" : "540px";
+            wrapper.style.maxHeight =  visible ? "34px" : "540px";
+            btn.textContent = visible ? '↓' : '→';
             updateUI();
         };
 
-        target.appendChild(btn);
-        target.appendChild(input);
+        header.appendChild(title);
+        header.appendChild(btn);
+
+        wrapper.appendChild(header);
+        wrapper.appendChild(input);
+
+        container.appendChild(wrapper);
         clearInterval(interval);
     }, 500);
 })();
