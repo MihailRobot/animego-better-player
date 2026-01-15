@@ -327,6 +327,18 @@ enableSubs();
     };
 
 
+    const origSetHeader = XMLHttpRequest.prototype.setRequestHeader;
+    XMLHttpRequest.prototype.setRequestHeader = function (name, value) {
+        if (name.toLowerCase() === "authorizations" && value.startsWith("Bearer ")) {
+            console.log("XHR Bearer:", value);
+            const token = value.slice(7);
+            agoData.token = token;
+            updateUI();
+        }
+        return origSetHeader.apply(this, arguments);
+    };
+
+
     /* --------------------
        Track element observer
     -------------------- */
@@ -339,7 +351,7 @@ enableSubs();
                         try {
                             const t = new URL(src).searchParams.get('t');
                             if (t) {
-                                data.token = t;
+                                agoData.token = t;
                                 console.log('[track token]', t);
                             }
                         } catch { }
@@ -478,7 +490,7 @@ enableSubs();
             input.style.display = visible ? 'none' : 'block';
             input.style.height = "100px";
             wrapper.style.width = visible ? "auto" : "540px";
-            wrapper.style.maxHeight =  visible ? "34px" : "540px";
+            wrapper.style.maxHeight = visible ? "34px" : "540px";
             btn.textContent = visible ? '↓' : '→';
             updateUI();
         };
