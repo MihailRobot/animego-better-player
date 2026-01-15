@@ -331,6 +331,7 @@ enableSubs();
     XMLHttpRequest.prototype.setRequestHeader = function (name, value) {
         if (name.toLowerCase() === "authorizations" && value.startsWith("Bearer ")) {
             console.log("XHR Bearer:", value);
+            if(!value.includes(" ")) return origSetHeader.apply(this, arguments);
             const token = value.slice(7);
             agoData.token = token;
             updateUI();
