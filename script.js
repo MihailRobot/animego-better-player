@@ -307,10 +307,12 @@ enableSubs();
        XHR HOOK → m3u8
     =============================== */
 
+
+    player.quality = 1080
+
     const origSetHeader = XMLHttpRequest.prototype.setRequestHeader;
     XMLHttpRequest.prototype.setRequestHeader = function (name, value) {
         if (name.toLowerCase() === "authorizations" && value.startsWith("Bearer ")) {
-            console.log("XHR Bearer:", value);
             if (!value.includes(" ")) return origSetHeader.apply(this, arguments);
             const token = value.slice(7);
             agoData.token = token;
@@ -338,35 +340,6 @@ enableSubs();
 
         return xhr;
     };
-
-
-
-
-
-    /* --------------------
-       Track element observer
-    -------------------- */
-    const trackObserver = new MutationObserver(mutations => {
-        for (const mutation of mutations) {
-            for (const node of mutation.addedNodes) {
-                if (node.tagName === 'TRACK') {
-                    const src = node.src;
-                    if (src) {
-                        try {
-                            const t = new URL(src).searchParams.get('t');
-                            if (t) {
-                                agoData.token = t;
-                                console.log('[track token]', t);
-                            }
-                        } catch { }
-                    }
-                }
-            }
-        }
-    });
-
-    trackObserver.observe(document.body, { childList: true, subtree: true });
-
 
 
     const perfObserver = new PerformanceObserver(list => {
